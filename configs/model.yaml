@@ -1,0 +1,29 @@
+method: Resnet2VQ
+weight: ['out/autosdf/vqvae_epoch-best.pth',
+         'out/autosdf/rand_tf_epoch-latest.pth']
+seed: 123
+device:
+  use_gpu: True
+  gpu_ids: '0'
+  num_workers: 2
+data:
+  resolution: 32
+train:
+  epochs: 200
+  phase: 'all'
+  freeze: []
+  batch_size: 2
+test:
+  phase: 'all'
+  batch_size: 2
+demo:
+  phase: 'all'
+log:
+  save_results: True
+  vis_step: 100
+  print_step: 50
+  path: out/autosdf
+
+
+
+
