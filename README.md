@@ -1,43 +1,24 @@
-# Ligand-Based Drug Design using UniGuide Framework
+# UniGuide: Unified Guidance for Geometry-Conditioned Molecular Generation
 
-### Additional Requirements
+# Setup
+First, please create a new environment by running 
+```
+conda env create -f environment.yml
 
-oddt - 0.7
+```
 
-pytorch3d - 0.7.1
-
-Other packages include tqdm, yaml, lmdb.
-
-### Data Preprocessing
-Download and extract the MOSES dataset as described by the authors of ShapeMol: https://arxiv.org/abs/2308.11890 
-
-### Training the Unconditional Equivariant Diffusion Model for 3D molecules
-
-Please use the command below to train the diffusion model:
+# QuickVina 2
+For measuring Vina score, intall QuickVina 2:
 ```bash
-python -m scripts.train_diffusion ./config/training/unconditional_shapemol.yml --logdir <path to save trained models>
+wget https://github.com/QVina/qvina/raw/master/bin/qvina2.1
+chmod +x qvina2.1 
+
 ```
-
-### Test
-
-We provided our trained model in the directory "trained_models".
-
-Please use the command below to generate ligands given a test reference ligand:
+In order to prepare the receptor for docking, we recommend to create a new environment:
 ```bash
-python -m scripts.sample_diffusion ./config/sampling/ --result_path ./result/uniguide/ --data_id 0
-```
-where data_id is selected from [0,999], and it refers to the index of reference ligand.
 
-### Analyze Results 
+conda create -n mgltools -c bioconda mgltools
 
-We also provided a jupyter notebook in /notebooks/Analyze_results.ipynb to visualize all the generated molecules and analyze their properties.
+```
 
-## Citation
-```
-@article{chen2023shape,
-  title={Shape-conditioned 3D Molecule Generation via Equivariant Diffusion Models},
-  author={Chen, Ziqi and Peng, Bo and Parthasarathy, Srinivasan and Ning, Xia},
-  journal={arXiv preprint arXiv:2308.11890},
-  year={2023}
-}
-```
+
