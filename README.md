@@ -19,7 +19,7 @@ In particular, we guide the ligand-protein joint model provided by DiffBDD:
 python test.py <checkpoint>.ckpt --conditioning <conditioning> --test_dir <bindingmoad_dir>/processed_noH/test/ --outdir <output_dir> --sanitize
 ```
 There are different ways to determine the size of sampled molecules. 
-- `conditioning`: 
+- `--conditioning`: 'guidance-resampling' or 'inpainting'
 - `--fix_n_nodes`: generates ligands with the same number of nodes as the reference molecule
 - `--n_nodes_bias`: we add 5 nodes to CrossDocked samples and 10 to Binding Moad samples
 - `--n_samples`: Number of sampled molecules
