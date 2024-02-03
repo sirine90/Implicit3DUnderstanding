@@ -1,64 +1,43 @@
-# Structure-based Drug Design with Equivariant Diffusion Models
+# Ligand-Based Drug Design using UniGuide Framework
 
-## Data Preprocessing
-We follow: https://github.com/arneschneuing/DiffSBDD/tree/main in processing data from CrossDocked and Binding Moad
+### Additional Requirements
 
-## Pre-trained models:
-We use pre-trained models from: https://github.com/arneschneuing/DiffSBDD/tree/main
-In particular, we guide the ligand-protein joint model provided by DiffBDD:
-- `moad_ca_joint.ckpt`
-- `moad_fullatom_joint.ckpt`
-- `crossdocked_ca_joint.ckpt`
+oddt - 0.7
 
+pytorch3d - 0.7.1
 
-## Sampling
+Other packages include tqdm, yaml, lmdb.
 
-### Sample molecules for all pockets in the test set
-`test.py` can be used to sample molecules for the entire testing set:
+### Data Preprocessing
+Download and extract the MOSES dataset as described by the authors of ShapeMol: https://arxiv.org/abs/2308.11890 
+
+### Training the Unconditional Equivariant Diffusion Model for 3D molecules
+
+Please use the command below to train the diffusion model:
 ```bash
-python test.py <checkpoint>.ckpt --conditioning <conditioning> --test_dir <bindingmoad_dir>/processed_noH/test/ --outdir <output_dir> --sanitize
-```
-There are different ways to determine the size of sampled molecules. 
-- `--conditioning`: 'guidance-resampling' or 'inpainting'
-- `--fix_n_nodes`: generates ligands with the same number of nodes as the reference molecule
-- `--n_nodes_bias`: we add 5 nodes to CrossDocked samples and 10 to Binding Moad samples
-- `--n_samples`: Number of sampled molecules
-- `--timesteps`: Number of denoising timesteps for inference 
-- `--resamplings` | Number of resampling steps 
-
-
-### Metrics
-For assessing basic molecular properties create an instance of the `MoleculeProperties` class and run its `evaluate` method:
-```python
-from analysis.metrics import MoleculeProperties
-mol_metrics = MoleculeProperties()
-all_qed, all_sa, all_logp, all_lipinski, per_pocket_diversity = \
-    mol_metrics.evaluate(pocket_mols)
+python -m scripts.train_diffusion ./config/training/unconditional_shapemol.yml --logdir <path to save trained models>
 ```
 
-For computing docking scores, run QuickVina as described below. 
+### Test
 
-### QuickVina2
-First, convert all protein PDB files to PDBQT files using MGLTools
+We provided our trained model in the directory "trained_models".
+
+Please use the command below to generate ligands given a test reference ligand:
 ```bash
-conda activate mgltools
-cd analysis
-python docking_py27.py <bindingmoad_dir>/processed_noH/test/ <output_dir> bindingmoad
-cd ..
-conda deactivate
+python -m scripts.sample_diffusion ./config/sampling/ --result_path ./result/uniguide/ --data_id 0
 ```
-QuickVina scores is computed as:
-```bash
-conda activate sbdd-env
-python analysis/docking.py --pdbqt_dir <docking_py27_outdir> --sdf_dir <test_outdir> --out_dir <qvina_outdir> --write_csv --write_dict
-```
+where data_id is selected from [0,999], and it refers to the index of reference ligand.
+
+### Analyze Results 
+
+We also provided a jupyter notebook in /notebooks/Analyze_results.ipynb to visualize all the generated molecules and analyze their properties.
 
 ## Citation
 ```
-@article{schneuing2022structure,
-  title={Structure-based drug design with equivariant diffusion models},
-  author={Schneuing, Arne and Du, Yuanqi and Harris, Charles and Jamasb, Arian and Igashov, Ilia and Du, Weitao and Blundell, Tom and Li{\'o}, Pietro and Gomes, Carla and Welling, Max and others},
-  journal={arXiv preprint arXiv:2210.13695},
-  year={2022}
+@article{chen2023shape,
+  title={Shape-conditioned 3D Molecule Generation via Equivariant Diffusion Models},
+  author={Chen, Ziqi and Peng, Bo and Parthasarathy, Srinivasan and Ning, Xia},
+  journal={arXiv preprint arXiv:2308.11890},
+  year={2023}
 }
 ```
